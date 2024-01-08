@@ -23,9 +23,23 @@
 
     <!--通用-->
     <string name="txt_login">登入</string>
-    <string name="title_activity_sql_searching">SqlSearching</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="your_sql_conmend">你的SQL指令</string>
+    <string name="title_activity_sql_searching">歡迎來到資料中心</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--資料庫按鈕-->
+    <string name="button_add">新增</string>
+    <string name="button_upgrade">修改</string>
+    <string name="button_delete">刪除</string>
+    <string name="button_clear">清除</string>
+    <string name="button_send">送出</string>
+
+    <!--資料庫種類-->
+    <string-array name="database_type">
+        <item>user</item> <!--用戶資料(acc, pas)-->
+        <item>stock</item> <!--商品庫存(pId,pName, pNumber)-->
+        <item>transaction</item> <!--交易紀錄(tId, tDatetime, tDescription-->
+    </string-array>
 
 
 </resources>
