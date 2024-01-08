@@ -22,4 +22,10 @@
         android:name="com.example.xpos.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_sql_searcging"
+        android:name="com.example.xpos.ui.sqlSearching.SqlSearchingFragment"
+        android:label="@string/nav_sqlSearching"
+        tools:layout="@layout/fragment_sql_searching" />
 </navigation>

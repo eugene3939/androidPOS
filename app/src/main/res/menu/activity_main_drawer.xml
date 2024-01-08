@@ -20,6 +20,6 @@
         <item
             android:id="@+id/nav_sql_searcging"
             android:icon="@drawable/ic_folder"
-            android:title="@string/nav_sqlSearching" />
+            android:title="@string/menu_sqlSearching" />
     </group>
 </menu>

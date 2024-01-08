@@ -27,7 +27,7 @@ class login : AppCompatActivity() {
             var password = binding.edtPas.text.toString()
 
             //確認身分1
-            if (account == "123" && password == "123") {
+            if (account == "1" && password == "1") {
                 val intent = Intent(this, MainActivity::class.java)
                 Toast.makeText(this, "Welcome: $account", Toast.LENGTH_SHORT).show()
                 startActivity(intent)
