@@ -29,19 +29,21 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <!--輸入欄位-->
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.75"
-                android:hint="@string/your_sql_conmend">
+                android:hint="@string/txt_query">
             </EditText>
 
+            <!--搜尋欄位-->
             <Button
-                android:id="@+id/btn_send"
+                android:id="@+id/btn_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.25"
-                android:text="@string/button_send"/>
+                android:text="@string/button_search"/>
         </LinearLayout>
 
         <!--資料庫選擇-->
@@ -50,7 +52,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!--資料庫選擇下拉是選單-->
+            <!--下拉式選單選擇資料庫-->
             <Spinner
                 android:id="@+id/sql_db_spinner"
                 android:layout_width="match_parent"
@@ -101,8 +103,8 @@
         </LinearLayout>
 
         <!--資料庫內容(要能被新增、修改、刪除)-->
-        <ListView
-            android:id="@+id/ls_DBshow"
+        <GridView
+            android:id="@+id/gr_DB_Show"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>
