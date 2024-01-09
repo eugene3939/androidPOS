@@ -27,18 +27,27 @@ class login : AppCompatActivity() {
         val dbHelper = UserDataBaseHelper(this)
         dbrw = dbHelper.writableDatabase
 
-        /// 檢查是否存在預設用戶 Eugene
-        val checkQuery = "SELECT * FROM UserTable WHERE UName='Eugene' AND account = 1 AND password = 1;"
-        val checkCursor = dbrw.rawQuery(checkQuery, null)
+        // 檢查 UserTable 是否為空
+        val isEmptyQuery = "SELECT COUNT(*) FROM UserTable;"
+        val countCursor = dbrw.rawQuery(isEmptyQuery, null)
 
-        if (checkCursor.count == 0) {
-            // 新增預設用戶
-            dbrw.execSQL("INSERT INTO UserTable(UName, account, password) VALUES('Eugene', 1, 1);")
-            Log.d("成功新增","Eugene資訊")
+        if (countCursor.moveToFirst()) {
+            val count = countCursor.getInt(0)
+            //UserTable為空，新增預設資料進table
+            if (count == 0) {
+                Log.d("UserTable為空", "還沒有放資料")
+                // 新增預設用戶 Eugene
+                dbrw.execSQL("INSERT INTO UserTable(UName, account, password) VALUES('Eugene', 1, 1);")
+                dbrw.execSQL("INSERT INTO UserTable(UName, account, password) VALUES('Oscar', 3, 3);")
+
+                Log.d("成功新增", "預設用戶")
+            } else {    //顯示用戶內容
+                Log.d("UserTable不為空", "他一共有 $count 組rows.") }
+        } else {
+            Log.e("UserTable有其他問題", "Error in counting rows.")
         }
 
-        checkCursor.close()
-
+        countCursor.close()
 
         // 登入按鈕
         binding.btnLogin.setOnClickListener {
@@ -46,39 +55,25 @@ class login : AppCompatActivity() {
             val acc = binding.edtAcc.text.toString()
             val pas = binding.edtPas.text.toString()
 
-            val loginQuery = "SELECT * FROM UserTable WHERE account = '$acc' AND password = '$pas';"
+            val loginQuery = "SELECT * FROM UserTable WHERE account = ${acc} AND password = ${pas};"
             val loginCursor = dbrw.rawQuery(loginQuery, null)
 
+            // 檢查是否有查詢結果
             if (loginCursor.moveToFirst()) {
-                // 資料庫中包含 User 的資料
+
+                val userName = loginCursor.getString(loginCursor.getColumnIndex("Uname")) //取得用戶名稱
                 val intent = Intent(this, MainActivity::class.java)
-                Toast.makeText(this, "Welcome: $acc", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Welcome: $userName", Toast.LENGTH_SHORT).show()
+                Log.d("用戶登入成功", "用戶名稱: $userName")
                 startActivity(intent)
             } else {
                 // 資料庫中未包含 User 的資料
                 Toast.makeText(this, "登入失敗", Toast.LENGTH_SHORT).show()
                 Log.d("登入失敗提示: ", loginQuery)
             }
-            loginCursor.close()
+
+            loginCursor?.close() // 確保在使用完畢後關閉 Cursor
         }
-
-        // 資料庫內容檢查
-        val allQuery = "SELECT * FROM UserTable;"
-        val allCursor = dbrw.rawQuery(allQuery, null)
-
-        if (allCursor.moveToFirst()) {
-            do {
-                val uid = allCursor.getInt(allCursor.getColumnIndex("Uid"))
-                val uname = allCursor.getString(allCursor.getColumnIndex("UName"))
-                val account = allCursor.getInt(allCursor.getColumnIndex("account"))
-                val password = allCursor.getInt(allCursor.getColumnIndex("password"))
-
-                Log.d("用戶資料", "UID: $uid, UName: $uname, Account: $account, Password: $password")
-            } while (allCursor.moveToNext())
-        }
-
-        allCursor.close()
-
     }
 
     override fun onDestroy() {
