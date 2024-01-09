@@ -60,7 +60,6 @@ class login : AppCompatActivity() {
 
             // 檢查是否有查詢結果
             if (loginCursor.moveToFirst()) {
-
                 val userName = loginCursor.getString(loginCursor.getColumnIndex("Uname")) //取得用戶名稱
                 val intent = Intent(this, MainActivity::class.java)
                 Toast.makeText(this, "Welcome: $userName", Toast.LENGTH_SHORT).show()

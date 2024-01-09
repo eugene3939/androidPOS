@@ -40,7 +40,7 @@
 
         <!--還在考慮是否要能自動新增欄位(可能會產生空值、還有刪除的一系列問題)-->
         <!--primary key lock-->
-        <item>User</item> <!--用戶資料 (Uid,Uname,acc, pas)--> <!--User為操作者也就是店員，帳1密皆為整數型別-->
+        <item>User</item> <!--用戶資料 (Uid,Uname,account, password)--> <!--User為操作者也就是店員，帳1密皆為整數型別-->
         <item>Product</item> <!--商品項目，包含庫存 (Pid,Pname, Pnumber, Pphoto)-->
         <item>Transaction</item> <!--交易紀錄 (tId, tDatetime, tDescription-->
     </string-array>

@@ -55,8 +55,6 @@ class MainActivity : AppCompatActivity() {
         val dbHelper = ProductDataBaseHelper(this)
         dbrw = dbHelper.writableDatabase
 
-//        Log.d("成功初始化商品資料庫", "沒有商品")
-
         // 檢查 ProductTable 是否為空
         val isEmptyQuery = "SELECT COUNT(*) FROM ProductTable;"
         val countCursor = dbrw.rawQuery(isEmptyQuery, null)
