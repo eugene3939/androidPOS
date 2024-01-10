@@ -45,5 +45,22 @@
         <item>Transaction</item> <!--交易紀錄 (tId, tDatetime, tDescription-->
     </string-array>
 
+    <!--UserDB欄位-->
+    <string-array name="UserDBitems">
+        <item>Uid</item>
+        <item>Uname</item>
+        <item>account</item>
+        <item>password</item>
+    </string-array>
+
+    <!--UserDB欄位-->
+    <string-array name="ProductDBitems">
+        <item>Pid</item>
+        <item>Pname</item>
+        <item>Pprice</item>
+        <item>Pnumber</item>
+        <item>Pphoto</item>
+    </string-array>
+
 
 </resources>

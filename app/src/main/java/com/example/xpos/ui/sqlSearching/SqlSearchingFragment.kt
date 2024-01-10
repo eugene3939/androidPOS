@@ -1,7 +1,6 @@
 package com.example.xpos.ui.sqlSearching
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
@@ -11,12 +10,11 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.GridView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.xpos.R
-import com.example.xpos.databinding.FragmentSlideshowBinding
 import com.example.xpos.databinding.FragmentSqlSearchingBinding
 import com.example.xpos.ui.dataBaseManager.ProductDataBaseHelper
 import com.example.xpos.ui.dataBaseManager.UserDataBaseHelper
@@ -28,6 +26,10 @@ class SqlSearchingFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var dbrw: SQLiteDatabase
 
+    //table的欄位名稱
+    private var userColumns: MutableList<String> = mutableListOf()
+    private var productColumns: MutableList<String> = mutableListOf()
+
     // 在類別內部宣告一個空的List<String>用來存放欄位名稱
     private val data: MutableList<String> = mutableListOf()
 
@@ -38,6 +40,10 @@ class SqlSearchingFragment : Fragment() {
     ): View {
         _binding = FragmentSqlSearchingBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        //初始化table的欄位名稱
+        userColumns = resources.getStringArray(R.array.UserDBitems).toMutableList()
+        productColumns = resources.getStringArray(R.array.ProductDBitems).toMutableList()
 
         // 初始化商品資料庫
         val dbHelper = UserDataBaseHelper(requireContext())
@@ -81,6 +87,7 @@ class SqlSearchingFragment : Fragment() {
             }
         }
 
+        //Gridview點擊處理
         binding.grDBShow.onItemClickListener = object : AdapterView.OnItemClickListener {
 
             override fun onItemClick(
@@ -89,7 +96,7 @@ class SqlSearchingFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                Log.d("目前所在的GridView索引是", "位置: $id")
+                Toast.makeText(requireContext(), data[position], Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -117,7 +124,6 @@ class SqlSearchingFragment : Fragment() {
         data.clear()
         // Table陣列
         val dbArrays = resources.getStringArray(R.array.database_type)
-        val dbName = dbArrays[nowDBid].toString()
 
         // 根據位置初始化資料庫
         when (nowDBid) {
@@ -126,14 +132,14 @@ class SqlSearchingFragment : Fragment() {
                 val dbHelper = UserDataBaseHelper(requireContext())
                 dbrw = dbHelper.writableDatabase
                 // 根據需要執行對 User 資料庫的查詢並處理資料
-                fetchAllData("UserTable", arrayOf("Uid", "Uname", "account", "password"))
+                fetchAllData("UserTable", userColumns)
             }
             1 -> {
                 // 初始化 Product 資料庫
                 val dbHelper = ProductDataBaseHelper(requireContext())
                 dbrw = dbHelper.writableDatabase
                 // 根據需要執行對 Product 資料庫的查詢並處理資料
-                fetchAllData("ProductTable", arrayOf("Pid", "Pname", "Pprice", "Pnumber", "Pphoto"))
+                fetchAllData("ProductTable", productColumns)
             }
             else -> {
                 // 其他情況，可以添加更多的條件分支
@@ -144,15 +150,15 @@ class SqlSearchingFragment : Fragment() {
         }
     }
 
-    // 抽取出的共用函數
+    // 搜尋全部欄位
     @SuppressLint("Range")
-    private fun fetchAllData(tableName: String, columns: Array<String>) {
+    private fun fetchAllData(tableName: String, columns: MutableList<String>) {
         // 執行查詢
         val query = "SELECT * FROM $tableName;"
         val cursor = dbrw.rawQuery(query, null)
 
         // 檢查是否有查詢結果
-        if (cursor.moveToFirst()) {
+        if (cursor!= null && cursor.moveToFirst()) {
             // 取得資料表的欄位名稱陣列
             val columnNames: Array<String> = cursor.columnNames
             // 加入欄位名稱到回傳項目
@@ -167,6 +173,8 @@ class SqlSearchingFragment : Fragment() {
                 // 限制colum
                 binding.grDBShow.numColumns = columns.size
             } while (cursor.moveToNext())
+        }else{
+            Toast.makeText(requireContext(), "Table還沒建立喔",Toast.LENGTH_SHORT).show()
         }
 
         cursor.close()
