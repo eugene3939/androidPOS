@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.GridView
 import android.widget.TextView
@@ -79,6 +80,18 @@ class SqlSearchingFragment : Fragment() {
             }
         }
 
+        binding.grDBShow.onItemClickListener = object : AdapterView.OnItemClickListener {
+
+            override fun onItemClick(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Log.d("目前所在的GridView索引是", "位置: $id")
+            }
+        }
+
         //更新GridView顯示所在資料庫內容
         updateGridView(nowDBid)
 
@@ -117,19 +130,33 @@ class SqlSearchingFragment : Fragment() {
 
                 // 檢查是否有查詢結果
                 if (cursor.moveToFirst()) {
+
+                    // 取得資料表的欄位名稱陣列
+                    val columnNames: Array<String> = cursor.columnNames
+                    // 加入欄位名稱到回傳項目
+                    for (columnName in columnNames) {
+                        data.add(columnName)
+                    }
+
                     do {
                         // 讀取每一列的資料
+                        val uid = cursor.getString(cursor.getColumnIndex("Uid"))
                         val userName = cursor.getString(cursor.getColumnIndex("Uname"))
                         val account = cursor.getInt(cursor.getColumnIndex("account"))
                         val password = cursor.getInt(cursor.getColumnIndex("password"))
 
-                        Log.d("用戶資料集", "項目")
-
                         // 合併欄位資料，這裡以字串形式呈現，你可以根據需要調整格式
-                        val rowData = "用戶名稱: $userName, 用戶帳號: $account, 用戶密碼: $password"
+//                        val rowData = "用戶名稱: $userName, 用戶帳號: $account, 用戶密碼: $password" //合併整欄
 
                         // 將合併後的資料添加到顯示清單
-                        data.add(rowData)
+                        data.add("$uid")
+                        data.add("$userName")
+                        data.add("$account")
+                        data.add("$password")
+
+                        //限制colum
+                        binding.grDBShow.numColumns=4
+
                     } while (cursor.moveToNext())
                 }
 
@@ -146,18 +173,34 @@ class SqlSearchingFragment : Fragment() {
 
                 // 檢查是否有查詢結果
                 if (cursor.moveToFirst()) {
-                    do {
+                    // 取得資料表的欄位名稱陣列
+                    val columnNames: Array<String> = cursor.columnNames
+
+                    // 加入欄位名稱到回傳項目
+                    for (columnName in columnNames) {
+                        data.add(columnName)
+                    }
+                    do {1
                         // 讀取每一列的資料
+                        val Pid = cursor.getString(cursor.getColumnIndex("Pid"))
                         val Pname = cursor.getString(cursor.getColumnIndex("Pname"))
                         val Pprice = cursor.getInt(cursor.getColumnIndex("Pprice"))
                         val Pnumber = cursor.getInt(cursor.getColumnIndex("Pnumber"))
                         val Pphoto = cursor.getInt(cursor.getColumnIndex("Pphoto"))
 
                         // 合併欄位資料，這裡以字串形式呈現，你可以根據需要調整格式
-                        val rowData = "商品名稱: $Pname, 商品價格: $Pprice, 商品數量: $Pnumber, 商品照片: $Pphoto"
+//                        val rowData = "商品名稱: $Pname, 商品價格: $Pprice, 商品數量: $Pnumber, 商品照片: $Pphoto"
 
                         // 將合併後的資料添加到顯示清單
-                        data.add(rowData)
+                        data.add("$Pid")
+                        data.add("$Pname")
+                        data.add("$Pprice")
+                        data.add("$Pnumber")
+                        data.add("$Pphoto")
+
+                        //限制colum
+                        binding.grDBShow.numColumns=5
+
                     } while (cursor.moveToNext())
                 }
 
