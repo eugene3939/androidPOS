@@ -1,8 +1,6 @@
 package com.example.xpos.ui.sqlSearching
 
 import android.annotation.SuppressLint
-import android.app.Dialog
-import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
@@ -12,8 +10,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -41,7 +37,6 @@ class SqlSearchingFragment : Fragment() {
 
     //現在的欄位個數
     private var currentColumnsNum: Int = 0
-    private var editValue: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,7 +56,7 @@ class SqlSearchingFragment : Fragment() {
 
         // 初始化 ViewModel
         val sqlSearchingViewModel =
-            ViewModelProvider(this).get(SqlSearchingViewModel::class.java)
+            ViewModelProvider(this)[SqlSearchingViewModel::class.java]
 
         //預設資料庫索引為User (0)
         var nowDBid = 0
@@ -96,15 +91,8 @@ class SqlSearchingFragment : Fragment() {
         }
 
         //Gridview點擊處理
-        binding.grDBShow.onItemClickListener = object : AdapterView.OnItemClickListener {
-
-            override fun onItemClick(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-
+        binding.grDBShow.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
                 // 創建 Bundle，將GridView點擊位置資訊放入
                 val bundle = Bundle()
                 bundle.putInt("clickedGridViewPosition", position)
@@ -115,9 +103,8 @@ class SqlSearchingFragment : Fragment() {
 
                 // 顯示 BottomSheetFragment
                 bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
-//              Toast.makeText(requireContext(), data[position], Toast.LENGTH_SHORT).show()
+                //Toast.makeText(requireContext(), data[position], Toast.LENGTH_SHORT).show()
             }
-        }
 
         //更新GridView顯示所在資料庫內容
         updateGridView(nowDBid)
@@ -169,12 +156,10 @@ class SqlSearchingFragment : Fragment() {
                         Log.d("Bundle回傳","午安 $clickedPosition")
                         //前往對應的服務項目
 
-                        if (position==0){   //新增
-                            Toast.makeText(requireContext(), "新增 $clickedPosition",Toast.LENGTH_SHORT).show()
-                        }else if(position==1){  //修改
-                            Toast.makeText(requireContext(), "修改 $clickedPosition",Toast.LENGTH_SHORT).show()
-                        }else{  //刪除
-                            Toast.makeText(requireContext(), "刪除 $clickedPosition",Toast.LENGTH_SHORT).show()
+                        when (position) {
+                            0 -> Toast.makeText(requireContext(), "新增 $clickedPosition", Toast.LENGTH_SHORT).show()
+                            1 -> Toast.makeText(requireContext(), "修改 $clickedPosition", Toast.LENGTH_SHORT).show()
+                            else -> Toast.makeText(requireContext(), "刪除 $clickedPosition", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -201,7 +186,7 @@ class SqlSearchingFragment : Fragment() {
         // 清空先前的資料
         data.clear()
         // Table陣列
-        val dbArrays = resources.getStringArray(R.array.database_type)
+        //val dbArrays = resources.getStringArray(R.array.database_type)
 
         // 根據位置初始化資料庫
         when (nowDBid) {
@@ -249,7 +234,8 @@ class SqlSearchingFragment : Fragment() {
             do {
                 // 讀取每一列的資料
                 for (columnName in columns) {
-                    data.add(cursor.getString(cursor.getColumnIndex(columnName)))
+                    val columnIndex = cursor.getColumnIndex(columnName)
+                    data.add(cursor.getString(columnIndex))
                 }
 
                 // 限制column
