@@ -1,6 +1,7 @@
 package com.example.xpos.ui.sqlSearching
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
@@ -10,9 +11,12 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.xpos.R
@@ -113,7 +117,35 @@ class SqlSearchingFragment : Fragment() {
         return root
     }
 
+    //AlertDialoge 連接編輯頁面
+    class CustomDialogFragment : DialogFragment() {
 
+        override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
+            val builder = AlertDialog.Builder(requireActivity())
+            val inflater = requireActivity().layoutInflater
+            val view = inflater.inflate(R.layout.sql_modify_items, null)
+
+            // 獲取佈局中的控件
+            val edtItems = view.findViewById<EditText>(R.id.edtItems)
+            val btnPositive = view.findViewById<Button>(R.id.btnPositive)
+            val btnNegative = view.findViewById<Button>(R.id.btnNegative)
+
+            // 設置按鈕點擊事件
+            btnPositive.setOnClickListener {
+                Log.d("你好","安安")
+                dismiss()
+            }
+
+            btnNegative.setOnClickListener {
+                dismiss()
+            }
+
+            // 設置自訂佈局到對話框
+            builder.setView(view)
+
+            return builder.create()
+        }
+    }
 
     //bottom view sheet
     class BottomSheetFragment : BottomSheetDialogFragment() {
@@ -151,14 +183,21 @@ class SqlSearchingFragment : Fragment() {
 
                     // 在這裡使用點擊的位置進行相應的處理
                     if (clickedPosition == -1) {
-                        Log.d("不正規的點擊","早安")
+                        //Log.d("不正規的點擊","早安")
                     }else{
                         Log.d("Bundle回傳","午安 $clickedPosition")
                         //前往對應的服務項目
 
                         when (position) {
-                            0 -> Toast.makeText(requireContext(), "新增 $clickedPosition", Toast.LENGTH_SHORT).show()
-                            1 -> Toast.makeText(requireContext(), "修改 $clickedPosition", Toast.LENGTH_SHORT).show()
+                            0 -> {
+                                //連接到alertDialog
+                                val customDialog = CustomDialogFragment()
+                                customDialog.show(requireActivity().supportFragmentManager, "CustomDialog")
+                                Toast.makeText(requireContext(), "新增 $clickedPosition", Toast.LENGTH_SHORT).show()
+                            }
+                            1 ->{
+                                Toast.makeText(requireContext(), "修改 $clickedPosition", Toast.LENGTH_SHORT).show()
+                            }
                             else -> Toast.makeText(requireContext(), "刪除 $clickedPosition", Toast.LENGTH_SHORT).show()
                         }
                     }
