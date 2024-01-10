@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import com.example.xpos.R
 import com.example.xpos.databinding.FragmentSqlSearchingBinding
 import com.example.xpos.ui.dataBaseManager.ProductDataBaseHelper
 import com.example.xpos.ui.dataBaseManager.UserDataBaseHelper
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class SqlSearchingFragment : Fragment() {
 
@@ -32,6 +34,9 @@ class SqlSearchingFragment : Fragment() {
 
     // 在類別內部宣告一個空的List<String>用來存放欄位名稱
     private val data: MutableList<String> = mutableListOf()
+
+    //現在的欄位個數
+    private var nowColumnNumbers: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,7 +101,18 @@ class SqlSearchingFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                Toast.makeText(requireContext(), data[position], Toast.LENGTH_SHORT).show()
+
+                // 創建 Bundle，將GridView點擊位置資訊放入
+                val bundle = Bundle()
+                bundle.putInt("clickedGridViewPosition", position)
+
+                // 創建 BottomSheetFragment 並將 Bundle 放入
+                val bottomSheetFragment = BottomSheetFragment()
+                bottomSheetFragment.arguments = bundle
+
+                // 顯示 BottomSheetFragment
+                bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
+//              Toast.makeText(requireContext(), data[position], Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -104,6 +120,63 @@ class SqlSearchingFragment : Fragment() {
         updateGridView(nowDBid)
 
         return root
+    }
+
+    //bottom view sheet
+    class BottomSheetFragment : BottomSheetDialogFragment() {
+
+        override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            return inflater.inflate(R.layout.sql_search_items, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+            val listView: ListView = view.findViewById(R.id.ls_searchItems)
+
+            // 資料操作選項
+            val items = arrayOf("新增","修改", "刪除")
+
+            // 創建 ArrayAdapter 並設置到 ListView 中
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
+            listView.adapter = adapter
+
+            // 設置 ListView 的點擊事件
+            listView.setOnItemClickListener { _, _, position, _ ->
+//                val selectedItem = items[position]
+
+                // 從 arguments 中取得 Bundle
+                val bundle = arguments
+
+                //有bundle才進行讀取
+                if (bundle != null) {
+                    // 從 Bundle 中取得點擊的位置
+                    val clickedPosition = bundle.getInt("clickedGridViewPosition", -1)
+
+                    // 在這裡使用點擊的位置進行相應的處理
+                    if (clickedPosition == -1) {
+                        Log.d("不正規的點擊","早安")
+                    }else{
+                        Log.d("Bundle回傳","午安 $clickedPosition")
+                        //前往對應的服務項目
+
+                        if (position==0){   //新增
+                            Toast.makeText(requireContext(), "新增 $clickedPosition",Toast.LENGTH_SHORT).show()
+                        }else if(position==1){  //修改
+                            Toast.makeText(requireContext(), "修改 $clickedPosition",Toast.LENGTH_SHORT).show()
+                        }else{  //刪除
+                            Toast.makeText(requireContext(), "刪除 $clickedPosition",Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+                // 在這裡處理選擇的項目
+                dismiss()  // 關閉 BottomSheetDialog
+            }
+        }
     }
 
 
