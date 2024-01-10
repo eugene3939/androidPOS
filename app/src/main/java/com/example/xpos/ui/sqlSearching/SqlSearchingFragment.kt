@@ -28,6 +28,9 @@ class SqlSearchingFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var dbrw: SQLiteDatabase
 
+    // 在類別內部宣告一個空的List<String>用來存放欄位名稱
+    private val data: MutableList<String> = mutableListOf()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,17 +64,15 @@ class SqlSearchingFragment : Fragment() {
         binding.sqlDbSpinner.adapter = spinnerAdapter
 
         //下拉式選單變更選擇的資料庫
-        binding.sqlDbSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.sqlDbSpinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
                 //更新所在資料庫索引
                 nowDBid = position
 
 //              val selectedItem = parent?.getItemAtPosition(position)    //取得選擇的資料
-
                 //更新GridView顯示所在資料庫內容
                 updateGridView(nowDBid)
-
                 Log.d("目前所在的Table索引是", "索引: $nowDBid")
             }
 
@@ -98,113 +99,41 @@ class SqlSearchingFragment : Fragment() {
         return root
     }
 
+
     // 更新 GridView 中的資料
     private fun updateGridView(nowDBid: Int) {
-        // 在這裡根據 databaseName 更新 GridView，你需要使用適當的邏輯和資料
-        // 以下僅為示例，你應該根據實際需求處理資料
-        val gridView: GridView = binding.grDBShow
-        val gridAdapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1, getTableData(nowDBid))
-        gridView.adapter = gridAdapter
+        // 清空先前的資料
+        data.clear()
+        // 獲取指定資料庫的資料
+        getTableData(nowDBid)
+        // 顯示在 GridView
+        binding.grDBShow.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, data)
     }
 
-    // 獲取指定資料庫的資料，這裡需要根據實際情況實現
+    // 獲取指定資料庫的資料
     @SuppressLint("Range")
-    private fun getTableData(nowDBid: Int): List<String> {
-        //顯示資料清單
-        val data: MutableList<String> = mutableListOf()
-        //Table陣列
+    private fun getTableData(nowDBid: Int) {
+        // 清空先前的資料
+        data.clear()
+        // Table陣列
         val dbArrays = resources.getStringArray(R.array.database_type)
         val dbName = dbArrays[nowDBid].toString()
 
-        //根據位置初始化資料庫
+        // 根據位置初始化資料庫
         when (nowDBid) {
             0 -> {
                 // 初始化 User 資料庫
                 val dbHelper = UserDataBaseHelper(requireContext())
                 dbrw = dbHelper.writableDatabase
                 // 根據需要執行對 User 資料庫的查詢並處理資料
-
-                // 執行查詢
-                val query = "SELECT * FROM UserTable;"
-                val cursor = dbrw.rawQuery(query, null)
-
-                // 檢查是否有查詢結果
-                if (cursor.moveToFirst()) {
-
-                    // 取得資料表的欄位名稱陣列
-                    val columnNames: Array<String> = cursor.columnNames
-                    // 加入欄位名稱到回傳項目
-                    for (columnName in columnNames) {
-                        data.add(columnName)
-                    }
-
-                    do {
-                        // 讀取每一列的資料
-                        val uid = cursor.getString(cursor.getColumnIndex("Uid"))
-                        val userName = cursor.getString(cursor.getColumnIndex("Uname"))
-                        val account = cursor.getInt(cursor.getColumnIndex("account"))
-                        val password = cursor.getInt(cursor.getColumnIndex("password"))
-
-                        // 合併欄位資料，這裡以字串形式呈現，你可以根據需要調整格式
-//                        val rowData = "用戶名稱: $userName, 用戶帳號: $account, 用戶密碼: $password" //合併整欄
-
-                        // 將合併後的資料添加到顯示清單
-                        data.add("$uid")
-                        data.add("$userName")
-                        data.add("$account")
-                        data.add("$password")
-
-                        //限制colum
-                        binding.grDBShow.numColumns=4
-
-                    } while (cursor.moveToNext())
-                }
-
-                cursor.close()
+                fetchAllData("UserTable", arrayOf("Uid", "Uname", "account", "password"))
             }
             1 -> {
                 // 初始化 Product 資料庫
                 val dbHelper = ProductDataBaseHelper(requireContext())
                 dbrw = dbHelper.writableDatabase
                 // 根據需要執行對 Product 資料庫的查詢並處理資料
-                // 執行查詢
-                val query = "SELECT * FROM ProductTable;"
-                val cursor = dbrw.rawQuery(query, null)
-
-                // 檢查是否有查詢結果
-                if (cursor.moveToFirst()) {
-                    // 取得資料表的欄位名稱陣列
-                    val columnNames: Array<String> = cursor.columnNames
-
-                    // 加入欄位名稱到回傳項目
-                    for (columnName in columnNames) {
-                        data.add(columnName)
-                    }
-                    do {1
-                        // 讀取每一列的資料
-                        val Pid = cursor.getString(cursor.getColumnIndex("Pid"))
-                        val Pname = cursor.getString(cursor.getColumnIndex("Pname"))
-                        val Pprice = cursor.getInt(cursor.getColumnIndex("Pprice"))
-                        val Pnumber = cursor.getInt(cursor.getColumnIndex("Pnumber"))
-                        val Pphoto = cursor.getInt(cursor.getColumnIndex("Pphoto"))
-
-                        // 合併欄位資料，這裡以字串形式呈現，你可以根據需要調整格式
-//                        val rowData = "商品名稱: $Pname, 商品價格: $Pprice, 商品數量: $Pnumber, 商品照片: $Pphoto"
-
-                        // 將合併後的資料添加到顯示清單
-                        data.add("$Pid")
-                        data.add("$Pname")
-                        data.add("$Pprice")
-                        data.add("$Pnumber")
-                        data.add("$Pphoto")
-
-                        //限制colum
-                        binding.grDBShow.numColumns=5
-
-                    } while (cursor.moveToNext())
-                }
-
-                cursor.close()
+                fetchAllData("ProductTable", arrayOf("Pid", "Pname", "Pprice", "Pnumber", "Pphoto"))
             }
             else -> {
                 // 其他情況，可以添加更多的條件分支
@@ -213,8 +142,34 @@ class SqlSearchingFragment : Fragment() {
                 data.add(" - Item 3")
             }
         }
+    }
 
-        return data
+    // 抽取出的共用函數
+    @SuppressLint("Range")
+    private fun fetchAllData(tableName: String, columns: Array<String>) {
+        // 執行查詢
+        val query = "SELECT * FROM $tableName;"
+        val cursor = dbrw.rawQuery(query, null)
+
+        // 檢查是否有查詢結果
+        if (cursor.moveToFirst()) {
+            // 取得資料表的欄位名稱陣列
+            val columnNames: Array<String> = cursor.columnNames
+            // 加入欄位名稱到回傳項目
+            data.addAll(columnNames.toList())
+
+            do {
+                // 讀取每一列的資料
+                for (columnName in columns) {
+                    data.add(cursor.getString(cursor.getColumnIndex(columnName)))
+                }
+
+                // 限制colum
+                binding.grDBShow.numColumns = columns.size
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
     }
 
 
