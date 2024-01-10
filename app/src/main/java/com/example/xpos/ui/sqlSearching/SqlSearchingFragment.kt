@@ -1,6 +1,8 @@
 package com.example.xpos.ui.sqlSearching
 
 import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -36,7 +40,8 @@ class SqlSearchingFragment : Fragment() {
     private val data: MutableList<String> = mutableListOf()
 
     //現在的欄位個數
-    private var nowColumnNumbers: Int = 0
+    private var currentColumnsNum: Int = 0
+    private var editValue: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,8 +65,6 @@ class SqlSearchingFragment : Fragment() {
 
         //預設資料庫索引為User (0)
         var nowDBid = 0
-
-        Log.d("現在所在的資料庫索引在", "${nowDBid}號的資料庫")
 
         //標題1
         val textView: TextView = binding.textSqlSearchShow
@@ -119,8 +122,11 @@ class SqlSearchingFragment : Fragment() {
         //更新GridView顯示所在資料庫內容
         updateGridView(nowDBid)
 
+
         return root
     }
+
+
 
     //bottom view sheet
     class BottomSheetFragment : BottomSheetDialogFragment() {
@@ -179,7 +185,6 @@ class SqlSearchingFragment : Fragment() {
         }
     }
 
-
     // 更新 GridView 中的資料
     private fun updateGridView(nowDBid: Int) {
         // 清空先前的資料
@@ -232,10 +237,14 @@ class SqlSearchingFragment : Fragment() {
 
         // 檢查是否有查詢結果
         if (cursor!= null && cursor.moveToFirst()) {
+
             // 取得資料表的欄位名稱陣列
             val columnNames: Array<String> = cursor.columnNames
             // 加入欄位名稱到回傳項目
             data.addAll(columnNames.toList())
+
+            // 更新全域變數 currentColumnsSize
+            currentColumnsNum = columnNames.size
 
             do {
                 // 讀取每一列的資料
@@ -243,8 +252,8 @@ class SqlSearchingFragment : Fragment() {
                     data.add(cursor.getString(cursor.getColumnIndex(columnName)))
                 }
 
-                // 限制colum
-                binding.grDBShow.numColumns = columns.size
+                // 限制column
+                binding.grDBShow.numColumns = currentColumnsNum
             } while (cursor.moveToNext())
         }else{
             Toast.makeText(requireContext(), "Table還沒建立喔",Toast.LENGTH_SHORT).show()
@@ -252,7 +261,6 @@ class SqlSearchingFragment : Fragment() {
 
         cursor.close()
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
