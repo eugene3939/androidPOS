@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
@@ -23,20 +23,21 @@
             android:textAlignment="center"
             android:textSize="20sp"/>
 
-        <!--直接輸入SQL指令-->
+        <!--直接輸入query指令-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <!--輸入欄位-->
-            <EditText
+            <AutoCompleteTextView
+                android:id="@+id/edt_query"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.75"
                 android:textSize="20sp"
                 android:hint="@string/txt_query">
-            </EditText>
+            </AutoCompleteTextView>
 
             <!--搜尋欄位-->
             <Button
@@ -59,12 +60,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"/>
 
+            <!--資料庫內容(要能被新增、修改、刪除)-->
+            <GridView
+                android:id="@+id/gr_DB_Show"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <!--新增資料按鈕-->
+            <Button
+                android:id="@+id/btn_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_add"/>
         </LinearLayout>
 
-        <!--資料庫內容(要能被新增、修改、刪除)-->
-        <GridView
-            android:id="@+id/gr_DB_Show"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
     </LinearLayout>
 </FrameLayout>

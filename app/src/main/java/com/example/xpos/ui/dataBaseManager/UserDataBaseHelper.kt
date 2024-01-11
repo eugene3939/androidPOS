@@ -16,8 +16,8 @@ class UserDataBaseHelper(context: Context): SQLiteOpenHelper(context,DATABASE_NA
     override fun onCreate(db: SQLiteDatabase) {
         // 在這裡建立資料庫表格等相關邏輯
         db.execSQL("CREATE TABLE IF NOT EXISTS UserTable (" //建立UserTable
-                + "Uid INTEGER PRIMARY KEY AUTOINCREMENT,"  //用戶id
-                + "Uname TEXT,"     //用戶名稱
+                + "uId INTEGER PRIMARY KEY AUTOINCREMENT,"  //用戶id
+                + "uName TEXT,"     //用戶名稱
                 + "account INTEGER,"    //帳號整數
                 + "password INTEGER);") //密碼整數
 

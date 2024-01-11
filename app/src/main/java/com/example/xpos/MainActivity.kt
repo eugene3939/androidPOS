@@ -23,8 +23,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var dbrw: SQLiteDatabase //預設資料庫
-
     @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,33 +48,6 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-        // 初始化商品資料庫
-        val dbHelper = ProductDataBaseHelper(this)
-        dbrw = dbHelper.writableDatabase
-
-        // 檢查 ProductTable 是否為空
-        val isEmptyQuery = "SELECT COUNT(*) FROM ProductTable;"
-        val countCursor = dbrw.rawQuery(isEmptyQuery, null)
-
-        if (countCursor.moveToFirst()) {
-            val count = countCursor.getInt(0)
-            //UserTable為空，新增預設資料進table
-            if (count == 0) {
-                Log.d("ProductTable為空", "還沒有放資料")
-                // 新增預設商品Apple、Pineapple、Snapple
-                dbrw.execSQL("INSERT INTO ProductTable(Pname, Pprice, Pnumber,Pphoto) VALUES('Apple', 50, 100, '0');")
-                dbrw.execSQL("INSERT INTO ProductTable(Pname, Pprice, Pnumber,Pphoto) VALUES('Pineapple', 100, 80, '0');")
-                dbrw.execSQL("INSERT INTO ProductTable(Pname, Pprice, Pnumber,Pphoto) VALUES('Snapple', 200, 60, '0');")
-
-                Log.d("成功新增", "3組預設商品")
-            } else {    //顯示用戶內容
-                Log.d("ProductTable不為空", "他一共有 $count 組rows.") }
-        } else {
-            Log.e("ProductTable有其他問題", "Error in counting rows.")
-        }
-
-        countCursor.close()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

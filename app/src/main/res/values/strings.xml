@@ -32,7 +32,7 @@
     <string name="btn_negative">取消</string>
 
     <!--資料庫按鈕-->
-    <string name="button_add">新增</string>
+    <string name="button_add">新增資料</string>
     <string name="button_upgrade">修改</string>
     <string name="button_delete">刪除</string>
     <string name="button_clear">清除</string>
@@ -52,19 +52,26 @@
 
     <!--UserDB欄位-->
     <string-array name="UserDBitems">
-        <item>Uid</item>
-        <item>Uname</item>
+        <item>uId</item>
+        <item>uName</item>
         <item>account</item>
         <item>password</item>
     </string-array>
 
-    <!--UserDB欄位-->
+    <!--ProductDB欄位-->
     <string-array name="ProductDBitems">
-        <item>Pid</item>
-        <item>Pname</item>
-        <item>Pprice</item>
-        <item>Pnumber</item>
-        <item>Pphoto</item>
+        <item>pId</item>
+        <item>pName</item>
+        <item>pPrice</item>
+        <item>pNumber</item>
+        <item>pPhoto</item>
+    </string-array>
+
+    <!--ProductDB欄位-->
+    <string-array name="TransactionDBitems">
+        <item>tId</item>
+        <item>tDate</item>
+        <item>tDescription</item>
     </string-array>
 
 

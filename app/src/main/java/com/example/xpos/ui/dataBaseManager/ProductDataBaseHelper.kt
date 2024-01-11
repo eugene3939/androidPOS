@@ -13,11 +13,11 @@ class ProductDataBaseHelper(context: Context): SQLiteOpenHelper(context,DATABASE
     override fun onCreate(db: SQLiteDatabase) {
         // 在這裡建立資料庫表格等相關邏輯
         db.execSQL("CREATE TABLE IF NOT EXISTS ProductTable (" //建立ProductTable
-                + "Pid INTEGER PRIMARY KEY AUTOINCREMENT,"  //商品id
-                + "Pname TEXT,"     //商品名稱
-                + "Pprice INTEGER," //商品價錢
-                + "Pnumber INTEGER," //商品數量
-                + "Pphoto TEXT);")  //商品圖片
+                + "pId INTEGER PRIMARY KEY AUTOINCREMENT,"  //商品id
+                + "pName TEXT,"     //商品名稱
+                + "pPrice INTEGER," //商品價錢
+                + "pNumber INTEGER," //商品數量
+                + "pPhoto TEXT);")  //商品圖片
 
 //        Log.d("進入table", "link start")
     }
