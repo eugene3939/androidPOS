@@ -113,12 +113,16 @@ class SqlSearchingFragment : Fragment() {
         //更新GridView顯示所在資料庫內容
         updateGridView(nowDBid)
 
-
         return root
     }
 
     //AlertDialoge 連接編輯頁面
-    class CustomDialogFragment : DialogFragment() {
+    class EditDataDialog : DialogFragment() {
+        // EditDataDialog的接口
+        fun showEditDataDialog() {
+            val editDataDialog = EditDataDialog()
+            editDataDialog.show(parentFragmentManager, "EditDataDialog")
+        }
 
         override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
             val builder = AlertDialog.Builder(requireActivity())
@@ -133,7 +137,11 @@ class SqlSearchingFragment : Fragment() {
             // 設置按鈕點擊事件
             btnPositive.setOnClickListener {
                 Log.d("你好","安安")
-                dismiss()
+                //edtItems.setText("你好安安")
+
+                // 調用外部類別的方法，更新 TextView 的內容
+                showEditDataDialog()
+//              dismiss()
             }
 
             btnNegative.setOnClickListener {
@@ -146,6 +154,7 @@ class SqlSearchingFragment : Fragment() {
             return builder.create()
         }
     }
+
 
     //bottom view sheet
     class BottomSheetFragment : BottomSheetDialogFragment() {
@@ -191,11 +200,11 @@ class SqlSearchingFragment : Fragment() {
                         when (position) {
                             0 -> {
                                 //連接到alertDialog
-                                val customDialog = CustomDialogFragment()
-                                customDialog.show(requireActivity().supportFragmentManager, "CustomDialog")
                                 Toast.makeText(requireContext(), "新增 $clickedPosition", Toast.LENGTH_SHORT).show()
                             }
                             1 ->{
+                                val editDialog = EditDataDialog()
+                                editDialog.show(requireActivity().supportFragmentManager, "CustomDialog")
                                 Toast.makeText(requireContext(), "修改 $clickedPosition", Toast.LENGTH_SHORT).show()
                             }
                             else -> Toast.makeText(requireContext(), "刪除 $clickedPosition", Toast.LENGTH_SHORT).show()

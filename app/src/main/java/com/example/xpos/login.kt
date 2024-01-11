@@ -55,7 +55,7 @@ class login : AppCompatActivity() {
             val acc = binding.edtAcc.text.toString()
             val pas = binding.edtPas.text.toString()
 
-            val loginQuery = "SELECT * FROM UserTable WHERE account = ${acc} AND password = ${pas};"
+            val loginQuery = "SELECT * FROM UserTable WHERE account = '$acc' AND password = '$pas';"
             val loginCursor = dbrw.rawQuery(loginQuery, null)
 
             // 檢查是否有查詢結果
