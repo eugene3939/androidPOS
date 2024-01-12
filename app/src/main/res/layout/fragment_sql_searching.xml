@@ -41,6 +41,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <!--下拉式選單選擇資料庫-->
+            <Spinner
+                android:id="@+id/sql_db_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"/>
 
             <!--欄位選擇框-->
             <GridView
@@ -48,24 +53,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"/>
 
-            <!--下拉式選單選擇資料庫-->
-            <Spinner
-                android:id="@+id/sql_db_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"/>
-
             <!--資料庫內容(要能被新增、修改、刪除)-->
             <GridView
                 android:id="@+id/gr_DB_Show"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-
-            <!--新增資料按鈕-->
-            <Button
-                android:id="@+id/btn_add"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/button_add"/>
         </LinearLayout>
 
     </LinearLayout>

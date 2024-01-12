@@ -10,11 +10,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.xpos.R
 import com.example.xpos.databinding.FragmentSqlSearchingBinding
 import com.example.xpos.ui.dataBaseManager.ProductDataBaseHelper
@@ -47,10 +44,6 @@ class SqlSearchingFragment : Fragment() {
         val dbHelper = UserDataBaseHelper(requireContext())
         dbrw = dbHelper.writableDatabase
 
-        // 初始化 ViewModel
-        val sqlSearchingViewModel =
-            ViewModelProvider(this)[SqlSearchingViewModel::class.java]
-
         //預設資料庫索引為User (0)
         var nowDBid = 0
 
@@ -68,6 +61,7 @@ class SqlSearchingFragment : Fragment() {
                 val selectedItem = parent?.getItemAtPosition(position)    //取得選擇的資料
                 //更新GridView顯示所在資料庫內容
                 updateGridView(nowDBid,null)
+
                 Log.d("目前所在的Table索引是", "索引: $selectedItem")
             }
 
@@ -91,16 +85,22 @@ class SqlSearchingFragment : Fragment() {
             val edtColumn: String = binding.edtQuery.text.toString()
             if (edtColumn != ""){   //有輸入才開始找
                 updateGridView(nowDBid, edtColumn)
+
+                //更新顯示欄位
+                nowColums.clear()
+                nowColums.add(edtColumn)
+                updateColumnNameShow()
             }
         }
 
-        //動態checkBox顯示全部的column種類
-        val checkBoxArray = resources.getStringArray(R.array.UserDBitems) //全部的table種類
-        val checkBoxAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,checkBoxArray)
-        binding.gsCheckbox.adapter = checkBoxAdapter
-        binding.gsCheckbox.numColumns=checkBoxArray.size
-
         return root
+    }
+
+    //顯示目前columns名稱
+    private fun updateColumnNameShow(){
+        val rowNameAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,nowColums)
+        binding.gsCheckbox.adapter = rowNameAdapter
+        binding.gsCheckbox.numColumns = nowColums.size
     }
 
     // 更新 GridView 中的資料
@@ -129,7 +129,6 @@ class SqlSearchingFragment : Fragment() {
 
                 // 根據需要執行對 User 資料庫的查詢並處理資料
                 selectionData("UserTable",nowColums,searchColumns)
-                edtAutoFilling(nowColums)    //editText自動填詞
             }
             1 -> {
                 // 初始化 Product 資料庫
@@ -139,7 +138,6 @@ class SqlSearchingFragment : Fragment() {
 
                 // 根據需要執行對 Product 資料庫的查詢並處理資料
                 selectionData("ProductTable",nowColums,searchColumns)
-                edtAutoFilling(nowColums)  //editText自動填詞
             }
             else -> {
                 // 初始化 Transaction 資料庫
@@ -149,9 +147,11 @@ class SqlSearchingFragment : Fragment() {
 
                 // 根據需要執行對 TransactionTable 的查詢並處理資料
                 selectionData("TransactionTable",nowColums,searchColumns)
-                edtAutoFilling(nowColums)  //editText自動填詞
             }
         }
+
+        updateColumnNameShow()   //更新rowName
+        edtAutoFilling(nowColums)  //editText自動填詞
     }
 
 
@@ -180,11 +180,6 @@ class SqlSearchingFragment : Fragment() {
 
         // 檢查是否有查詢結果
         if (cursor != null && cursor.moveToFirst()) {
-            // 取得資料表的欄位名稱陣列
-            val columnNames: Array<String> = cursor.columnNames
-            // 加入欄位名稱到回傳項目
-            data.addAll(columnNames.toList())
-
             do {
                 // 讀取每一列的資料
                 if (columnName != null) {
