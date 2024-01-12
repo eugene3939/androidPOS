@@ -3,6 +3,7 @@ package com.example.xpos
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -56,92 +57,62 @@ class login : AppCompatActivity() {
     }
 
 
-    private fun createUserDB(){
-        // 初始化資料庫
-        val dbHelper = UserDataBaseHelper(this)
+    private fun createDatabase(dbHelper: SQLiteOpenHelper, tableName: String, defaultData: List<String>) {
         dbrw = dbHelper.writableDatabase
 
-        // 檢查 UserTable 是否為空
-        val isEmptyQuery = "SELECT COUNT(*) FROM UserTable;"
+        // 檢查資料表是否為空
+        val isEmptyQuery = "SELECT COUNT(*) FROM $tableName;"
         val countCursor = dbrw.rawQuery(isEmptyQuery, null)
 
         if (countCursor.moveToFirst()) {
             val count = countCursor.getInt(0)
-            //UserTable為空，新增預設資料進table
-            if (count == 0) {
-                Log.d("UserTable為空", "還沒有放資料")
-                // 新增預設用戶 Eugene
-                dbrw.execSQL("INSERT INTO UserTable(uName, account, password) VALUES('Eugene', 1, 1);")
-                dbrw.execSQL("INSERT INTO UserTable(uName, account, password) VALUES('Oscar', 3, 3);")
 
-                Log.d("成功新增", "預設用戶")
-            } else {    //顯示用戶內容
-                Log.d("UserTable不為空", "他一共有 $count 組rows.") }
+            // 資料表為空，新增預設資料進table
+            if (count == 0) {
+                Log.d("$tableName 為空", "還沒有放資料")
+
+                for (data in defaultData) {
+                    dbrw.execSQL(data)
+                }
+
+                Log.d("成功新增", "${defaultData.size} 組預設資料")
+            } else {
+                Log.d("$tableName 不為空", "他一共有 $count 組rows.")
+            }
         } else {
-            Log.e("UserTable有其他問題", "Error in counting rows.")
+            Log.e("$tableName 有其他問題", "Error in counting rows.")
         }
 
         countCursor.close()
+    }
+
+    private fun createUserDB() {
+        val dbHelper = UserDataBaseHelper(this)
+        val defaultUserData = listOf(
+            "INSERT INTO UserTable(uName, account, password) VALUES('Eugene', 1, 1);",
+            "INSERT INTO UserTable(uName, account, password) VALUES('Oscar', 3, 3);"
+        )
+        createDatabase(dbHelper, "UserTable", defaultUserData)
     }
 
     private fun createProductDB() {
-        // 初始化商品資料庫
         val dbHelper = ProductDataBaseHelper(this)
-        dbrw = dbHelper.writableDatabase
-
-        // 檢查 ProductTable 是否為空
-        val isEmptyQuery = "SELECT COUNT(*) FROM ProductTable;"
-        val countCursor = dbrw.rawQuery(isEmptyQuery, null)
-
-        if (countCursor.moveToFirst()) {
-            val count = countCursor.getInt(0)
-            //UserTable為空，新增預設資料進table
-            if (count == 0) {
-                Log.d("ProductTable為空", "還沒有放資料")
-                // 新增預設商品Apple、Pineapple、Snapple
-                dbrw.execSQL(/* sql = */ "INSERT INTO ProductTable(pName, pPrice, pNumber,pPhoto) VALUES('Apple', 50, 100, '0');")
-                dbrw.execSQL(/* sql = */ "INSERT INTO ProductTable(pName, pPrice, pNumber,pPhoto) VALUES('Pineapple', 100, 80, '0');")
-                dbrw.execSQL(/* sql = */ "INSERT INTO ProductTable(pName, pPrice, pNumber,pPhoto) VALUES('Snapple', 200, 60, '0');")
-
-                Log.d("成功新增", "3組預設商品")
-            } else {    //顯示用戶內容
-                Log.d("ProductTable不為空", "他一共有 $count 組rows.") }
-        } else {
-            Log.e("ProductTable有其他問題", "Error in counting rows.")
-        }
-
-        countCursor.close()
-
+        val defaultProductData = listOf(
+            "INSERT INTO ProductTable(pName, pPrice, pNumber,pPhoto) VALUES('Apple', 50, 100, '0');",
+            "INSERT INTO ProductTable(pName, pPrice, pNumber,pPhoto) VALUES('Pineapple', 100, 80, '0');",
+            "INSERT INTO ProductTable(pName, pPrice, pNumber,pPhoto) VALUES('Snapple', 200, 60, '0');"
+        )
+        createDatabase(dbHelper, "ProductTable", defaultProductData)
     }
 
     private fun createTransactionDB() {
-        // 初始化商品資料庫
         val dbHelper = TransactionDataBaseHelper(this)
-        dbrw = dbHelper.writableDatabase
-
-        // 檢查 ProductTable 是否為空
-        val isEmptyQuery = "SELECT COUNT(*) FROM TransactionTable;"
-        val countCursor = dbrw.rawQuery(isEmptyQuery, null)
-
-        if (countCursor.moveToFirst()) {
-            val count = countCursor.getInt(0)
-            //UserTable為空，新增預設資料進table
-            if (count == 0) {
-                Log.d("ProductTable為空", "還沒有放資料")
-                // 新增預設商品Apple、Pineapple、Snapple
-                dbrw.execSQL("INSERT INTO TransactionTable(tDate, tDescription) VALUES('2018-12-10','0');")
-                dbrw.execSQL("INSERT INTO TransactionTable(tDate, tDescription) VALUES('2018-12-11','0');")
-                dbrw.execSQL("INSERT INTO TransactionTable(tDate, tDescription) VALUES('2018-12-12','0');")
-
-                Log.d("成功新增", "3組預設商品")
-            } else {    //顯示用戶內容
-                Log.d("TransactionTable不為空", "他一共有 $count 組rows.") }
-        } else {
-            Log.e("TransactionTable有其他問題", "Error in counting rows.")
-        }
-
-        countCursor.close()
-
+        val defaultTransactionData = listOf(
+            "INSERT INTO TransactionTable(tDate, tDescription) VALUES('2018-12-10','0');",
+            "INSERT INTO TransactionTable(tDate, tDescription) VALUES('2018-12-11','0');",
+            "INSERT INTO TransactionTable(tDate, tDescription) VALUES('2018-12-12','0');"
+        )
+        createDatabase(dbHelper, "TransactionTable", defaultTransactionData)
     }
 
     override fun onDestroy() {
