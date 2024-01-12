@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -29,15 +30,10 @@ class SqlSearchingFragment : Fragment() {
     private lateinit var dbrw: SQLiteDatabase
 
     //table的欄位名稱
-    private var userColumns: MutableList<String> = mutableListOf()
-    private var productColumns: MutableList<String> = mutableListOf()
-    private var transactionColumns: MutableList<String> = mutableListOf()
+    private var nowColums: MutableList<String> = mutableListOf()
 
     // 在類別內部宣告一個空的List<String>用來存放欄位名稱
     private val data: MutableList<String> = mutableListOf()
-
-    //現在的欄位個數
-    private var currentColumnsNum: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,12 +43,7 @@ class SqlSearchingFragment : Fragment() {
         _binding = FragmentSqlSearchingBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        //初始化table的欄位名稱
-        userColumns = resources.getStringArray(R.array.UserDBitems).toMutableList()
-        productColumns = resources.getStringArray(R.array.ProductDBitems).toMutableList()
-        transactionColumns = resources.getStringArray(R.array.TransactionDBitems).toMutableList()
-
-            // 初始化商品資料庫
+        // 初始化商品資料庫
         val dbHelper = UserDataBaseHelper(requireContext())
         dbrw = dbHelper.writableDatabase
 
@@ -62,12 +53,6 @@ class SqlSearchingFragment : Fragment() {
 
         //預設資料庫索引為User (0)
         var nowDBid = 0
-
-        //標題1
-        val textView: TextView = binding.textSqlSearchShow
-        sqlSearchingViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
 
         //下拉式選單顯示全部的table種類
         val tablesArray = resources.getStringArray(R.array.database_type) //全部的table種類
@@ -80,10 +65,10 @@ class SqlSearchingFragment : Fragment() {
                 //更新所在資料庫索引
                 nowDBid = position
 
-//              val selectedItem = parent?.getItemAtPosition(position)    //取得選擇的資料
+                val selectedItem = parent?.getItemAtPosition(position)    //取得選擇的資料
                 //更新GridView顯示所在資料庫內容
                 updateGridView(nowDBid,null)
-                Log.d("目前所在的Table索引是", "索引: $nowDBid")
+                Log.d("目前所在的Table索引是", "索引: $selectedItem")
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -94,7 +79,6 @@ class SqlSearchingFragment : Fragment() {
         //Gridview點擊處理
         binding.grDBShow.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
-
                 //顯示點擊id
                 Toast.makeText(requireContext(), "$position", Toast.LENGTH_SHORT).show()
             }
@@ -109,6 +93,12 @@ class SqlSearchingFragment : Fragment() {
                 updateGridView(nowDBid, edtColumn)
             }
         }
+
+        //動態checkBox顯示全部的column種類
+        val checkBoxArray = resources.getStringArray(R.array.UserDBitems) //全部的table種類
+        val checkBoxAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,checkBoxArray)
+        binding.gsCheckbox.adapter = checkBoxAdapter
+        binding.gsCheckbox.numColumns=checkBoxArray.size
 
         return root
     }
@@ -135,43 +125,35 @@ class SqlSearchingFragment : Fragment() {
                 // 初始化 User 資料庫
                 val dbHelper = UserDataBaseHelper(requireContext())
                 dbrw = dbHelper.writableDatabase
-                // 根據需要執行對 User 資料庫的查詢並處理資料
-                if (searchColumns==null){   //沒有單一查詢
-                    selectionAllColumnData("UserTable", userColumns)
-                }else{      //有單一查詢
-                    selectionNameColumnData("UserTable", searchColumns)
-                }
+                nowColums = resources.getStringArray(R.array.UserDBitems).toMutableList()
 
-                edtAutoFilling(userColumns)    //editText自動填詞
+                // 根據需要執行對 User 資料庫的查詢並處理資料
+                selectionData("UserTable",nowColums,searchColumns)
+                edtAutoFilling(nowColums)    //editText自動填詞
             }
             1 -> {
                 // 初始化 Product 資料庫
                 val dbHelper = ProductDataBaseHelper(requireContext())
                 dbrw = dbHelper.writableDatabase
-                // 根據需要執行對 Product 資料庫的查詢並處理資料
-                if (searchColumns==null){   //沒有單一查詢
-                    selectionAllColumnData("ProductTable", productColumns)
-                }else{      //有單一查詢
-                    selectionNameColumnData("ProductTable",searchColumns)
-                }
+                nowColums = resources.getStringArray(R.array.ProductDBitems).toMutableList()
 
-                edtAutoFilling(productColumns)  //editText自動填詞
+                // 根據需要執行對 Product 資料庫的查詢並處理資料
+                selectionData("ProductTable",nowColums,searchColumns)
+                edtAutoFilling(nowColums)  //editText自動填詞
             }
             else -> {
                 // 初始化 Transaction 資料庫
                 val dbHelper = TransactionDataBaseHelper(requireContext())
                 dbrw = dbHelper.writableDatabase
-                // 根據需要執行對 TransactionTable 的查詢並處理資料
-                if (searchColumns==null){   //沒有單一查詢
-                    selectionAllColumnData("TransactionTable", transactionColumns)
-                }else{      //有單一查詢
-                    selectionNameColumnData("TransactionTable",searchColumns)
-                }
+                nowColums = resources.getStringArray(R.array.TransactionDBitems).toMutableList()
 
-                edtAutoFilling(transactionColumns)  //editText自動填詞
+                // 根據需要執行對 TransactionTable 的查詢並處理資料
+                selectionData("TransactionTable",nowColums,searchColumns)
+                edtAutoFilling(nowColums)  //editText自動填詞
             }
         }
     }
+
 
     //editText自動填詞
     private fun edtAutoFilling(dbColumns: MutableList<String>) {
@@ -179,18 +161,22 @@ class SqlSearchingFragment : Fragment() {
         binding.edtQuery.setAdapter(autoCompleteAdapter)
     }
 
-    // 搜尋部分欄位
+    //依照欄位數、欄位名稱搜尋資料庫Select SQLite
     @SuppressLint("Range")
-    private fun selectionNameColumnData(tableName: String, columnName: String?) {
-        Log.d("目前欄位", "$columnName")
+    private fun selectionData(tableName: String, columns: MutableList<String>, columnName: String?){
+        Log.d("目前欄位", "$columns")
+
+        // 清空先前的資料(欄位名稱+欄位資料)
+        data.clear()
+
+        // 將欄位名稱轉換成字串，用於構建SQL查詢語句
+        val columnString = // 如果有指定 columnName，就只查詢單一欄位
+            columnName ?: // 否則查詢所有欄位
+            columns.joinToString(", ") // 將欄位名稱以逗號分隔
 
         // 執行查詢
-        val query = "SELECT $columnName FROM $tableName;"
-        Log.d("目前query 安安", query)
-
+        val query = "SELECT $columnString FROM $tableName;"
         val cursor = dbrw.rawQuery(query, null)
-
-        Log.d("目前query", query)
 
         // 檢查是否有查詢結果
         if (cursor != null && cursor.moveToFirst()) {
@@ -201,13 +187,25 @@ class SqlSearchingFragment : Fragment() {
 
             do {
                 // 讀取每一列的資料
-                val columnIndex = cursor.getColumnIndex(columnName)
-                data.add(cursor.getString(columnIndex))
-
+                if (columnName != null) {
+                    val columnIndex = cursor.getColumnIndex(columnName)
+                    data.add(cursor.getString(columnIndex))
+                } else {
+                    for (column in columns) {
+                        val columnIndex = cursor.getColumnIndex(column)
+                        data.add(cursor.getString(columnIndex))
+                    }
+                }
             } while (cursor.moveToNext())
 
+            // 如果是搜尋部分欄位，更新 nowColums
+            if (columnName != null) {
+                nowColums.clear()
+                nowColums.add(columnName)
+            }
+
             // 限制column
-            binding.grDBShow.numColumns = 1
+            binding.grDBShow.numColumns = nowColums.size
         } else {
             Toast.makeText(requireContext(), "Table還沒建立喔", Toast.LENGTH_SHORT).show()
         }
@@ -215,45 +213,6 @@ class SqlSearchingFragment : Fragment() {
         cursor.close()
     }
 
-    // 搜尋全部欄位
-    @SuppressLint("Range")
-    private fun selectionAllColumnData(tableName: String, columns: MutableList<String>) {
-        Log.d("目前欄位","$columns")
-
-        // 將欄位名稱轉換成字串，用於構建SQL查詢語句
-        val columnString = columns.joinToString(", ") // 將欄位名稱以逗號分隔
-
-        // 執行查詢
-        val query = "SELECT $columnString FROM $tableName;"
-        val cursor = dbrw.rawQuery(query, null)
-
-        // 檢查是否有查詢結果
-        if (cursor!= null && cursor.moveToFirst()) {
-
-            // 取得資料表的欄位名稱陣列
-            val columnNames: Array<String> = cursor.columnNames
-            // 加入欄位名稱到回傳項目
-            data.addAll(columnNames.toList())
-
-            // 更新全域變數 currentColumnsSize
-            currentColumnsNum = columnNames.size
-
-            do {
-                // 讀取每一列的資料
-                for (columnName in columns) {
-                    val columnIndex = cursor.getColumnIndex(columnName)
-                    data.add(cursor.getString(columnIndex))
-                }
-            } while (cursor.moveToNext())
-
-            // 限制column
-            binding.grDBShow.numColumns = currentColumnsNum
-        }else{
-            Toast.makeText(requireContext(), "Table還沒建立喔",Toast.LENGTH_SHORT).show()
-        }
-
-        cursor.close()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

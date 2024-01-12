@@ -11,18 +11,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/text_sqlSearchShow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="20dp"
-            android:text="@string/title_activity_sql_searching"
-            android:textAlignment="center"
-            android:textSize="20sp"/>
-
         <!--直接輸入query指令-->
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,6 +41,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <!--欄位選擇框-->
+            <GridView
+                android:id="@+id/gs_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"/>
 
             <!--下拉式選單選擇資料庫-->
             <Spinner

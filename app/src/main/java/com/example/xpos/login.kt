@@ -55,6 +55,7 @@ class login : AppCompatActivity() {
         }
     }
 
+
     private fun createUserDB(){
         // 初始化資料庫
         val dbHelper = UserDataBaseHelper(this)
